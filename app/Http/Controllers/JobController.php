@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\StoreJobRequest;
-use App\Http\Requests\UpdateJobRequest;
 use App\Models\Job;
 use App\Models\Tag;
+use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 
 class JobController extends Controller
 {
@@ -14,10 +16,10 @@ class JobController extends Controller
      */
     public function index()
     {
-        $jobs = Job::all()->groupBy('feactured');
+        $jobs = Job::latest()->with(['employer','tags'])->get()->groupBy('feactured');
         return view('jobs.index',[
-            'feacturedJob'=> $jobs[0],
             'jobs'=> $jobs[0],
+            'feacturedJob'=> $jobs[1],
             'tags'=> Tag::all()
         ]);
     }
@@ -27,15 +29,36 @@ class JobController extends Controller
      */
     public function create()
     {
-        //
+        return view('jobs.create');
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreJobRequest $request)
+    public function store(Request $request)
     {
-        //
+        $attributes=$request->validate([
+            'title'=>['required'],
+            'salary'=>['required'],
+            'location'=>['required'],
+            'contrat'=>['required',Rule::in(['Full Time','Part Time'])],
+            'url'=>['required'],
+            'tags'=>['nullable'],
+        ]);
+
+        $attributes['feactured'] = $request->has('feactured');
+
+        $job =Auth::user()->employer->jobs()->create(Arr::except($attributes, 'tags'));
+
+        if ($attributes['tags'] ?? false) {
+            
+            foreach (explode(',',$attributes['tags']) as $tag) {
+                $job->tag($tag);
+            }
+        }
+
+        return redirect('/');
+
     }
 
     /**
@@ -57,7 +80,7 @@ class JobController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateJobRequest $request, Job $job)
+    public function update(Request $request, Job $job)
     {
         //
     }

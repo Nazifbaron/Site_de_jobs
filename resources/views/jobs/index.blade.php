@@ -3,9 +3,9 @@
         <section class="text-center pt-6">
             <h1 class="font-bold text-4xl" >Trouvons votre prochain Travail</h1>
 
-            <form action="" class="mt-6">
-                <input type="text" placeholder="Developpeur Web....  " class="rounded-xl bg-white/20 border-white/10 px-5 py-4 w-full max-w-xl">
-            </form>
+            <x-forms.form action="/search" class="mt-6">
+                <x-forms.input :label="false" name="q" placeholder="Developpeur Web........"/>
+            </x-forms.form>
         </section>
         <section class="pt-10">
             <x-section-heading>Feactured Jobs</x-section-heading>

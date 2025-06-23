@@ -8,11 +8,10 @@ use Illuminate\Http\Request;
 class TagController extends Controller
 {
     
-    public function show(Tag $tag)
+    public function __invoke(Tag $tag)
     {
-        return view('tags.show', [
-            'tag' => $tag,
-            'jobs' => $tag->jobs // tous les jobs liés à ce tag
-        ]);
+        //récupéré tous les jobs associés a un tag
+        return view('resultas',['jobs'=>$tag->jobs]);
     }
+   
 }
